@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.38.33.27573",
-      "templateHash": "3370007469593101937"
+      "templateHash": "16695519178084351342"
     }
   },
   "parameters": {
@@ -229,7 +229,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.38.33.27573",
-              "templateHash": "15004523952438864293"
+              "templateHash": "12939848764310223107"
             }
           },
           "parameters": {
@@ -265,7 +265,7 @@
             }
           },
           "variables": {
-            "$fxv#0": "# This Dockerfile builds a CTFd (https://github.com/CTFd/CTFd) image that\r\n# enables TLS connectivity to Azure Database for MySQL.\r\n# More info: https://learn.microsoft.com/en-us/azure/mysql/flexible-server/concepts-root-certificate-rotation\r\nFROM ctfd/ctfd:3.7.0\r\n\r\nUSER root\r\nRUN apt-get update && apt-get install -y wget openssl --no-install-recommends \\\r\n    && apt-get clean \\\r\n    && rm -rf /var/lib/apt/lists/*\r\n\r\n# Create certificates directory\r\nRUN mkdir -p /opt/certificates/\r\n\r\n# Download the certificates\r\nRUN wget --user-agent=\"Mozilla\" --progress=dot:giga https://cacerts.digicert.com/DigiCertGlobalRootCA.crt -P /opt/certificates/\r\nRUN wget --user-agent=\"Mozilla\" --progress=dot:giga https://cacerts.digicert.com/DigiCertGlobalRootG2.crt -P /opt/certificates/\r\nRUN wget --user-agent=\"Mozilla\" --progress=dot:giga https://www.microsoft.com/pkiops/certs/Microsoft%20RSA%20Root%20Certificate%20Authority%202017.crt -P /opt/certificates/\r\n\r\n# Convert certificates to PEM format\r\nRUN openssl x509 -in /opt/certificates/DigiCertGlobalRootCA.crt -out /opt/certificates/DigiCertGlobalRootCA.crt.pem -outform PEM\r\nRUN openssl x509 -in /opt/certificates/DigiCertGlobalRootG2.crt -out /opt/certificates/DigiCertGlobalRootG2.crt.pem -outform PEM\r\nRUN openssl x509 -in \"/opt/certificates/Microsoft RSA Root Certificate Authority 2017.crt\" -out /opt/certificates/Microsoft-RSA-Root-CA-2017.crt.pem -outform PEM\r\n\r\n# Combine all certificates into a single bundle file\r\nRUN cat /opt/certificates/DigiCertGlobalRootCA.crt.pem \\\r\n        /opt/certificates/DigiCertGlobalRootG2.crt.pem \\\r\n        /opt/certificates/Microsoft-RSA-Root-CA-2017.crt.pem \\\r\n        > /opt/certificates/azure-mysql-ca-bundle.pem\r\n\r\n# Clean up individual certificate files (optional)\r\nRUN rm /opt/certificates/*.crt /opt/certificates/DigiCertGlobalRootCA.crt.pem \\\r\n       /opt/certificates/DigiCertGlobalRootG2.crt.pem \\\r\n       /opt/certificates/Microsoft-RSA-Root-CA-2017.crt.pem\r\n\r\nUSER 1001\r\nEXPOSE 8000\r\n\r\nENTRYPOINT [\"/opt/CTFd/docker-entrypoint.sh\"]\r\n",
+            "$fxv#0": "# This Dockerfile builds a CTFd (https://github.com/CTFd/CTFd) image that\r\n# enables TLS connectivity to Azure Database for MySQL.\r\n# More info: https://learn.microsoft.com/en-us/azure/mysql/flexible-server/concepts-root-certificate-rotation\r\nFROM ctfd/ctfd:3.7.0\r\n\r\nUSER root\r\nRUN apt-get update && apt-get install -y wget openssl --no-install-recommends \\\r\n    && apt-get clean \\\r\n    && rm -rf /var/lib/apt/lists/*\r\n\r\n# Create certificates directory\r\nRUN mkdir -p /opt/certificates/\r\n\r\n# Download the certificates\r\nRUN wget --user-agent=\"Mozilla\" --progress=dot:giga https://cacerts.digicert.com/DigiCertGlobalRootCA.crt -P /opt/certificates/\r\nRUN wget --user-agent=\"Mozilla\" --progress=dot:giga https://cacerts.digicert.com/DigiCertGlobalRootG2.crt -P /opt/certificates/\r\nRUN wget --user-agent=\"Mozilla\" --progress=dot:giga \"https://www.microsoft.com/pkiops/certs/Microsoft%20RSA%20Root%20Certificate%20Authority%202017.crt\" -O /opt/certificates/Microsoft-RSA-Root-CA-2017.crt\r\n\r\n# Convert certificates to PEM format\r\nRUN openssl x509 -in /opt/certificates/DigiCertGlobalRootCA.crt -out /opt/certificates/DigiCertGlobalRootCA.crt.pem -outform PEM\r\nRUN openssl x509 -in /opt/certificates/DigiCertGlobalRootG2.crt -out /opt/certificates/DigiCertGlobalRootG2.crt.pem -outform PEM\r\nRUN openssl x509 -in /opt/certificates/Microsoft-RSA-Root-CA-2017.crt -out /opt/certificates/Microsoft-RSA-Root-CA-2017.crt.pem -outform PEM\r\n\r\n# Combine all certificates into a single bundle file\r\nRUN cat /opt/certificates/DigiCertGlobalRootCA.crt.pem \\\r\n        /opt/certificates/DigiCertGlobalRootG2.crt.pem \\\r\n        /opt/certificates/Microsoft-RSA-Root-CA-2017.crt.pem \\\r\n        > /opt/certificates/azure-mysql-ca-bundle.pem\r\n\r\n# Clean up individual certificate files (optional)\r\nRUN rm /opt/certificates/*.crt /opt/certificates/DigiCertGlobalRootCA.crt.pem \\\r\n       /opt/certificates/DigiCertGlobalRootG2.crt.pem \\\r\n       /opt/certificates/Microsoft-RSA-Root-CA-2017.crt.pem\r\n\r\nUSER 1001\r\nEXPOSE 8000\r\n\r\nENTRYPOINT [\"/opt/CTFd/docker-entrypoint.sh\"]\r\n",
             "$fxv#1": "#!/bin/bash\r\nset -e\r\n\r\necho \"Waiting on RBAC replication\"\r\nsleep $initialDelay\r\n\r\necho \"$CONTENT\" > Dockerfile\r\n\r\naz acr build \\\r\n    --registry $acrName \\\r\n    --image $taggedImageName \\\r\n    --platform $platform \\\r\n    .\r\n",
             "containerRegistryName": "[format('ctfdacr{0}', uniqueString(resourceGroup().id))]",
             "ctfdImageName": "ctfd-azure-cert:latest"

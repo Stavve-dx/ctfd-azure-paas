@@ -14,12 +14,12 @@ RUN mkdir -p /opt/certificates/
 # Download the certificates
 RUN wget --user-agent="Mozilla" --progress=dot:giga https://cacerts.digicert.com/DigiCertGlobalRootCA.crt -P /opt/certificates/
 RUN wget --user-agent="Mozilla" --progress=dot:giga https://cacerts.digicert.com/DigiCertGlobalRootG2.crt -P /opt/certificates/
-RUN wget --user-agent="Mozilla" --progress=dot:giga https://www.microsoft.com/pkiops/certs/Microsoft%20RSA%20Root%20Certificate%20Authority%202017.crt -P /opt/certificates/
+RUN wget --user-agent="Mozilla" --progress=dot:giga "https://www.microsoft.com/pkiops/certs/Microsoft%20RSA%20Root%20Certificate%20Authority%202017.crt" -O /opt/certificates/Microsoft-RSA-Root-CA-2017.crt
 
 # Convert certificates to PEM format
 RUN openssl x509 -in /opt/certificates/DigiCertGlobalRootCA.crt -out /opt/certificates/DigiCertGlobalRootCA.crt.pem -outform PEM
 RUN openssl x509 -in /opt/certificates/DigiCertGlobalRootG2.crt -out /opt/certificates/DigiCertGlobalRootG2.crt.pem -outform PEM
-RUN openssl x509 -in "/opt/certificates/Microsoft RSA Root Certificate Authority 2017.crt" -out /opt/certificates/Microsoft-RSA-Root-CA-2017.crt.pem -outform PEM
+RUN openssl x509 -in /opt/certificates/Microsoft-RSA-Root-CA-2017.crt -out /opt/certificates/Microsoft-RSA-Root-CA-2017.crt.pem -outform PEM
 
 # Combine all certificates into a single bundle file
 RUN cat /opt/certificates/DigiCertGlobalRootCA.crt.pem \
